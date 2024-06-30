@@ -12,7 +12,7 @@ type App struct {
 	GRPCSrv *grpcapp.App
 }
 
-func New(log *logrus.Logger, grpcPort int, storagePath string, TokenTTL time.Duration) *App {
+func New(log *logrus.Logger, grpcPort int, TokenTTL time.Duration) *App {
 	grpcApp := grpcapp.New(log, grpcPort)
 
 	return &App{
