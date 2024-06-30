@@ -1,6 +1,6 @@
 root = "."
 testdata_dir = "testdata"
-tmp_dir = "tmp"
+tmp_dir = "./cmd/sso/tmp"
 
 [build]
   args_bin = []
@@ -28,7 +28,7 @@ tmp_dir = "tmp"
   stop_on_error = false
 
 [color]
-  app = ""
+  app = "blue"
   build = "yellow"
   main = "magenta"
   runner = "green"
@@ -36,7 +36,7 @@ tmp_dir = "tmp"
 
 [log]
   main_only = false
-  time = false
+  time = true
 
 [misc]
   clean_on_exit = false
@@ -47,5 +47,5 @@ tmp_dir = "tmp"
   proxy_port = 0
 
 [screen]
-  clear_on_rebuild = false
+  clear_on_rebuild = true
   keep_scroll = true
