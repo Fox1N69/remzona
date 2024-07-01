@@ -21,9 +21,17 @@ func main() {
 			logrus.Error("Error migrate table for auth service", err)
 			return
 		}
+		if err := db.Migration.AppMigrate(); err != nil {
+			logrus.Error("Error migrate table for app", err)
+			return
+		}
 	} else {
 		if err := db.Migration.AuthMigrate(postgres.WithDebug()); err != nil {
 			logrus.Error("Error migrate table for auth service", err)
+			return
+		}
+		if err := db.Migration.AppMigrate(postgres.WithDebug()); err != nil {
+			logrus.Error("Error migrate table for app", err)
 			return
 		}
 	}

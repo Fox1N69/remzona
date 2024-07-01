@@ -16,6 +16,7 @@ func WithDebug() MigrationOption {
 
 type Migration interface {
 	AuthMigrate(...MigrationOption) error
+	AppMigrate(...MigrationOption) error
 }
 
 type migration struct {
@@ -37,6 +38,22 @@ func (m *migration) AuthMigrate(opts ...MigrationOption) error {
 	}
 
 	if err := m.db.AutoMigrate(&models.User{}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *migration) AppMigrate(opts ...MigrationOption) error {
+	for _, opt := range opts {
+		opt(m)
+	}
+
+	if m.debug {
+		m.db = m.db.Debug()
+	}
+
+	if err := m.db.AutoMigrate(&models.App{}); err != nil {
 		return err
 	}
 
