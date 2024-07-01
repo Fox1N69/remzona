@@ -2,8 +2,11 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sso/internal/domain/models"
+	"sso/internal/lib/jwt"
+	"sso/storage"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -28,8 +31,12 @@ type UserProvider interface {
 }
 
 type AppProvider interface {
-	App(ctx context.Context, appID int) (models.App, error)
+	App(ctx context.Context, appID int64) (models.App, error)
 }
+
+var (
+	ErrInvalidCredentials = errors.New("invalide credentials")
+)
 
 // New returns a new instanse Auth service.
 func New(
@@ -48,14 +55,55 @@ func New(
 	}
 }
 
+// Login - login user in system and reutnr token
+// If user not found or invalidCredentials return error
 func (a *Auth) Login(
 	ctx context.Context,
 	email, password string,
 	appID int64,
 ) (string, error) {
-	panic("not implementet")
+	const op = "auth.Login"
+
+	log := a.log.WithField(op, "op")
+
+	log.Info("auttempting to login user")
+
+	user, err := a.usrProvider.User(ctx, email)
+	if err != nil {
+		if errors.Is(err, storage.ErrUserNotFound) {
+			a.log.Warn("user not found")
+
+			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		}
+
+		a.log.Error("failde to get user", err)
+
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(password)); err != nil {
+		a.log.Info("invalid credenttials", err)
+		return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	app, err := a.appProvider.App(ctx, appID)
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("user logged in successfully")
+
+	token, err := jwt.NewToken(user, app, a.tokenTTL)
+	if err != nil {
+		a.log.Error("failed to generate token")
+
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	return token, nil
 }
 
+// RegisterNewUser register new user in system and return userID
 func (a *Auth) RegisterNewUser(
 	ctx context.Context,
 	email, pass string,
@@ -83,6 +131,20 @@ func (a *Auth) RegisterNewUser(
 	return id, nil
 }
 
+// IsAdmin - check if the user is an admin
 func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
-	panic("not implementet")
+	const op = "auth.IsAdmin"
+
+	log := a.log.WithField(op, "op")
+
+	log.Info("check if user is admin")
+
+	isAdmin, err := a.usrProvider.IsAdmin(ctx, userID)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("check if user is admin: ", isAdmin)
+
+	return isAdmin, nil
 }
