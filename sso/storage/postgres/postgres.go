@@ -1,6 +1,12 @@
 package postgres
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"sso/internal/domain/models"
+	"sso/storage"
+
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -37,4 +43,26 @@ func (s *Storage) Stop() error {
 
 	db.Close()
 	return nil
+}
+
+func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (uint64, error) {
+	const op = "storage.postgres.SaveUser"
+
+	user := models.User{
+		Email:    email,
+		PassHash: passHash,
+	}
+
+	err := s.db.Create(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		} else if errors.Is(err, gorm.ErrInvalidData) {
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+		}
+
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return uint64(user.ID), nil
 }

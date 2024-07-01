@@ -3,7 +3,6 @@ module sso
 go 1.22.2
 
 require (
-	github.com/Fox1N69/remzona-protos v0.0.0-20240630124022-37a2c4363b66
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/sirupsen/logrus v1.9.3
@@ -15,6 +14,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
+	github.com/Fox1N69/remzona-protos v0.0.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.5.5 // indirect

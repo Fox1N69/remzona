@@ -22,16 +22,16 @@ type Auth struct {
 }
 
 type UserSaver interface {
-	SaveUser(ctx context.Context, email string, passHash []byte) (uid int64, err error)
+	SaveUser(ctx context.Context, email string, passHash []byte) (uid uint64, err error)
 }
 
 type UserProvider interface {
 	User(ctx context.Context, email string) (models.User, error)
-	IsAdmin(ctx context.Context, userID int64) (bool, error)
+	IsAdmin(ctx context.Context, userID uint64) (bool, error)
 }
 
 type AppProvider interface {
-	App(ctx context.Context, appID int64) (models.App, error)
+	App(ctx context.Context, appID uint64) (models.App, error)
 }
 
 var (
@@ -60,7 +60,7 @@ func New(
 func (a *Auth) Login(
 	ctx context.Context,
 	email, password string,
-	appID int64,
+	appID uint64,
 ) (string, error) {
 	const op = "auth.Login"
 
@@ -107,7 +107,7 @@ func (a *Auth) Login(
 func (a *Auth) RegisterNewUser(
 	ctx context.Context,
 	email, pass string,
-) (int64, error) {
+) (uint64, error) {
 	const op = "auth.RegisterNewUser"
 
 	log := a.log.WithFields(logrus.Fields{
@@ -132,7 +132,7 @@ func (a *Auth) RegisterNewUser(
 }
 
 // IsAdmin - check if the user is an admin
-func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
+func (a *Auth) IsAdmin(ctx context.Context, userID uint64) (bool, error) {
 	const op = "auth.IsAdmin"
 
 	log := a.log.WithField(op, "op")

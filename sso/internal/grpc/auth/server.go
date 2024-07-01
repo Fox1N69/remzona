@@ -11,8 +11,8 @@ import (
 
 type Auth interface {
 	Login(ctx context.Context, email, password string, appID int) (token string, err error)
-	RegisterNewUser(ctx context.Context, email, password string) (userID int64, err error)
-	IsAdmin(ctx context.Context, userID int64) (bool, error)
+	RegisterNewUser(ctx context.Context, email, password string) (userID uint64, err error)
+	IsAdmin(ctx context.Context, userID uint64) (bool, error)
 }
 
 type serverAPI struct {
