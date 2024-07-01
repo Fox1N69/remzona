@@ -16,4 +16,5 @@ type User struct {
 	GormCustom
 	Email    string `json:"email"`
 	PassHash []byte `json:"pass_hash"`
+	IsAdmin  bool   `json:"is_admin"`
 }

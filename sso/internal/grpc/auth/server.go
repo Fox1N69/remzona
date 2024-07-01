@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"errors"
+	"sso/internal/services/auth"
 
 	ssov1 "github.com/Fox1N69/remzona-protos/gen/go/sso"
 	"google.golang.org/grpc"
@@ -10,7 +12,7 @@ import (
 )
 
 type Auth interface {
-	Login(ctx context.Context, email, password string, appID int) (token string, err error)
+	Login(ctx context.Context, email, password string, appID uint64) (token string, err error)
 	RegisterNewUser(ctx context.Context, email, password string) (userID uint64, err error)
 	IsAdmin(ctx context.Context, userID uint64) (bool, error)
 }
@@ -30,9 +32,12 @@ func (s *serverAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.
 		return nil, status.Error(codes.Internal, "error validation")
 	}
 
-	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
+	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), req.GetAppId())
 	if err != nil {
-		// TODO ...
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invaled argument")
+		}
+
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
@@ -48,7 +53,10 @@ func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*
 
 	userID, err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPssword())
 	if err != nil {
-		// TODO ...
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invaled argument")
+		}
+
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
@@ -62,7 +70,9 @@ func (s *serverAPI) IsAdmin(ctx context.Context, req *ssov1.IsAdminRequest) (*ss
 
 	isAdmin, err := s.auth.IsAdmin(ctx, req.GetUserId())
 	if err != nil {
-		//TODO ...
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invaled argument")
+		}
 		return nil, status.Error(codes.Internal, "internal server error")
 	}
 

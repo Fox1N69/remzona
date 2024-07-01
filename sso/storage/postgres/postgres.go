@@ -70,21 +70,57 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 }
 
 // User return user by email or error
-func (s *Storage) User(ctx context.Context, email string) (*models.User, error) {
+func (s *Storage) User(ctx context.Context, email string) (models.User, error) {
 	const op = "storage.postgres.User"
 
 	var user models.User
 
 	if err := s.db.Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+			return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
 		} else if errors.Is(err, gorm.ErrInvalidData) {
-			return nil, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+			return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
 		}
 
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &user, nil
+	return user, nil
 }
 
+func (s *Storage) IsAdmin(ctx context.Context, userID uint64) (bool, error) {
+	const op = "storage.postgres.IsAdmin"
+
+	var user models.User
+
+	if err := s.db.Where("id = ?", userID).Find(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		} else if errors.Is(err, gorm.ErrInvalidData) {
+			return false, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+		}
+
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return user.IsAdmin, nil
+}
+
+// App return app or error
+func (s *Storage) App(ctx context.Context, appID uint64) (models.App, error) {
+	const op = "storage.postgres.App"
+
+	var app models.App
+
+	if err := s.db.Where("id = ?", appID).First(&app).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.App{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		} else if errors.Is(err, gorm.ErrInvalidData) {
+			return models.App{}, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+		}
+
+		return models.App{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return app, nil
+}
