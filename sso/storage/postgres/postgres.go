@@ -63,7 +63,7 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 			return 0, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return 0, fmt.Errorf("%w: %s", op, err)
+		return 0, fmt.Errorf("%w: %s", err, op)
 	}
 
 	return user.ID, nil
@@ -82,7 +82,7 @@ func (s *Storage) User(ctx context.Context, email string) (models.User, error) {
 			return models.User{}, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return models.User{}, fmt.Errorf("%w: %s", op, err)
+		return models.User{}, fmt.Errorf("%w: %s", err, op)
 	}
 
 	return user, nil
@@ -100,7 +100,7 @@ func (s *Storage) IsAdmin(ctx context.Context, userID uint64) (bool, error) {
 			return false, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return false, fmt.Errorf("%w: %s", op, err)
+		return false, fmt.Errorf("%w: %s", err, op)
 	}
 
 	return user.IsAdmin, nil
@@ -119,7 +119,7 @@ func (s *Storage) App(ctx context.Context, appID uint64) (models.App, error) {
 			return models.App{}, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return models.App{}, fmt.Errorf("%w: %s", op, err)
+		return models.App{}, fmt.Errorf("%w: %s", err, op)
 	}
 
 	return app, nil
