@@ -58,12 +58,12 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 	err := s.db.Create(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+			return 0, fmt.Errorf("%w: %s", op, storage.ErrUserNotFound)
 		} else if errors.Is(err, gorm.ErrInvalidData) {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+			return 0, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%w: %s", op, err)
 	}
 
 	return user.ID, nil
@@ -77,12 +77,12 @@ func (s *Storage) User(ctx context.Context, email string) (models.User, error) {
 
 	if err := s.db.Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+			return models.User{}, fmt.Errorf("%w: %s", op, storage.ErrUserNotFound)
 		} else if errors.Is(err, gorm.ErrInvalidData) {
-			return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+			return models.User{}, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return models.User{}, fmt.Errorf("%w: %s", op, err)
 	}
 
 	return user, nil
@@ -95,12 +95,12 @@ func (s *Storage) IsAdmin(ctx context.Context, userID uint64) (bool, error) {
 
 	if err := s.db.Where("id = ?", userID).Find(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+			return false, fmt.Errorf("%w: %s", op, storage.ErrUserNotFound)
 		} else if errors.Is(err, gorm.ErrInvalidData) {
-			return false, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+			return false, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return false, fmt.Errorf("%s: %w", op, err)
+		return false, fmt.Errorf("%w: %s", op, err)
 	}
 
 	return user.IsAdmin, nil
@@ -114,12 +114,12 @@ func (s *Storage) App(ctx context.Context, appID uint64) (models.App, error) {
 
 	if err := s.db.Where("id = ?", appID).First(&app).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.App{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+			return models.App{}, fmt.Errorf("%w: %s", op, storage.ErrUserNotFound)
 		} else if errors.Is(err, gorm.ErrInvalidData) {
-			return models.App{}, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+			return models.App{}, fmt.Errorf("%w: %s", op, storage.ErrInvalidData)
 		}
 
-		return models.App{}, fmt.Errorf("%s: %w", op, err)
+		return models.App{}, fmt.Errorf("%w: %s", op, err)
 	}
 
 	return app, nil

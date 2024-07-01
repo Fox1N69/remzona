@@ -73,22 +73,22 @@ func (a *Auth) Login(
 		if errors.Is(err, storage.ErrUserNotFound) {
 			a.log.Warn("user not found")
 
-			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+			return "", fmt.Errorf("%w: %s", op, ErrInvalidCredentials)
 		}
 
 		a.log.Error("failde to get user", err)
 
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", fmt.Errorf("%w: %s", op, err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(password)); err != nil {
 		a.log.Info("invalid credenttials", err)
-		return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		return "", fmt.Errorf("%w: %s", op, ErrInvalidCredentials)
 	}
 
 	app, err := a.appProvider.App(ctx, appID)
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", fmt.Errorf("%w: %s", op, err)
 	}
 
 	log.Info("user logged in successfully")
@@ -97,7 +97,7 @@ func (a *Auth) Login(
 	if err != nil {
 		a.log.Error("failed to generate token")
 
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", fmt.Errorf("%w: %s", op, err)
 	}
 
 	return token, nil
@@ -117,13 +117,13 @@ func (a *Auth) RegisterNewUser(
 	passHash, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	if err != nil {
 		log.Error("failed to generate password hashe: ", err)
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%w: %s", op, err)
 	}
 
 	id, err := a.usrSaver.SaveUser(ctx, email, passHash)
 	if err != nil {
 		log.Error("failed to save user: ", err)
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%w: %s", op, err)
 	}
 
 	log.Info("user registered")
@@ -141,7 +141,7 @@ func (a *Auth) IsAdmin(ctx context.Context, userID uint64) (bool, error) {
 
 	isAdmin, err := a.usrProvider.IsAdmin(ctx, userID)
 	if err != nil {
-		return false, fmt.Errorf("%s: %w", op, err)
+		return false, fmt.Errorf("%w: %s", op, err)
 	}
 
 	log.Info("check if user is admin: ", isAdmin)
