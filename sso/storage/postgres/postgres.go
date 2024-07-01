@@ -45,6 +45,8 @@ func (s *Storage) Stop() error {
 	return nil
 }
 
+// SaveUser - save user to database
+// and return userID or error
 func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (uint64, error) {
 	const op = "storage.postgres.SaveUser"
 
@@ -64,5 +66,25 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return uint64(user.ID), nil
+	return user.ID, nil
 }
+
+// User return user by email or error
+func (s *Storage) User(ctx context.Context, email string) (*models.User, error) {
+	const op = "storage.postgres.User"
+
+	var user models.User
+
+	if err := s.db.Where("email = ?", email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		} else if errors.Is(err, gorm.ErrInvalidData) {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrInvalidData)
+		}
+
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &user, nil
+}
+
