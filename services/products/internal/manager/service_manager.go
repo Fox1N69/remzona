@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"shop-server/infra"
+	"shop-server/internal/service"
 )
 
 type ServiceManager interface {
@@ -22,13 +23,13 @@ func NewServiceManager(infra infra.Infra) ServiceManager {
 }
 
 var (
-	orderServiceOnce sync.Once
-	orderService     service.OrderService
+	productServiceOnce sync.Once
+	productService     service.ProductServcie
 )
 
-func (sm *serviceManager) OrderService() service.OrderService {
-	orderServiceOnce.Do(func() {
-		orderService = service.NewOrderService(sm.repo.OrderRepo())
+func (sm *serviceManager) ProductService() service.ProductServcie {
+	productServiceOnce.Do(func() {
+		productService = service.NewProductService(sm.repo.ProductRepo())
 	})
-	return orderService
+	return productService
 }

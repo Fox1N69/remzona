@@ -4,9 +4,11 @@ import (
 	"sync"
 
 	"shop-server/infra"
+	"shop-server/internal/repo"
 )
 
 type RepoManager interface {
+	ProductRepo() repo.ProductRepo
 }
 
 type repoManager struct {
@@ -18,13 +20,14 @@ func NewRepoManager(infra infra.Infra) RepoManager {
 }
 
 var (
-	orderRepoOnce sync.Once
-	orderRepo     repo.OrderRepo
+	productRepoOnce sync.Once
+	productRepo     repo.ProductRepo
 )
 
-func (rm *repoManager) OrderRepo() repo.OrderRepo {
-	orderRepoOnce.Do(func() {
-		orderRepo = repo.NewOrderRepo(rm.infra.GormDB())
+func (rm *repoManager) ProductRepo() repo.ProductRepo {
+	productRepoOnce.Do(func() {
+		productRepo = repo.NewProductRepo(rm.infra.GormDB())
 	})
-	return orderRepo
+
+	return productRepo
 }
