@@ -1,6 +1,8 @@
 package service
 
-import "shop-server/internal/repo"
+import (
+	"shop-server/internal/repo"
+)
 
 type ProductServcie interface {
 }
